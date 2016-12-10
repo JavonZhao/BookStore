@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link href="bootstrap3.3.4/css/bootstrap.min.css" rel="stylesheet">
+<script src="js/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="bootstrap3.3.4/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="layer/layer.js" type="text/javascript"></script>
+<script type="text/javascript">
+	var request = new XMLHttpRequest();
+	function findAllBookInfos() {
+
+		//1-初始化URL(分页Servlet)
+		var url = "servlet/BookListPagedServlet";
+
+		//2-URL加入图书名称查询参数
+		var queryName = $("#bookName").val();
+		if (queryName != null && queryName != '')
+			url = url + "?bookName=" + queryName;
+
+		//3-获得查询页数			
+		var queryPage = $("#lblRequet").text();
+		if (queryPage == null || queryPage == "" || queryPage == "0") {
+			queryPage = 1;
+			$("#lblRequet").text(queryPage);
+		}
+
+		//4-URL加入请求页的索引(index)
+		if (url.indexOf("?") >= 0)
+			url = url + "&";
+		else
+			url = url + "?";
+		url = url + "pageIndex=" + (queryPage - 1);
+
+		//5-请求分页数据
+		request.open("get", url, false);
+		request.onreadystatechange = fillbooksTable;
+		request.send();
+	}
+
+	function fillbooksTable() {
+		if (request.readyState == 4 && request.status == 200) {
+			//清空图书列表
+			clearBooksTable();
+			var table = document.getElementById("booksTable");
+			var books = JSON.parse(request.responseText);
+			for ( var index in books) {
+				var newRow = table.insertRow();
+				var col1 = newRow.insertCell(0);
+				var col2 = newRow.insertCell(1);
+				var col3 = newRow.insertCell(2);
+				var col4 = newRow.insertCell(3);
+				var col5 = newRow.insertCell(4);
+				col1.innerHTML = books[index].bookId;
+				col2.innerHTML = books[index].bookName;
+				col3.innerHTML = books[index].bookPrice;
+				col4.innerHTML = books[index].publishDate;
+				col5.innerHTML = "<a href='#' onclick='choose(\""
+						+ books[index].bookId + "\");' >修改</a>"; // TODO 有待修改    
+			}
+			//更新分页Form
+			updatePageForm();
+		}
+	}
+
+	//更新分页Form
+	function updatePageForm() {
+		var url = "servlet/BooksCountServlet";
+		var queryName = $("#bookName").val();
+		if (queryName != null && queryName != '')
+			url = url + "?bookName=" + queryName;
+		request.open("get", url, true);
+		request.onreadystatechange = updatePageFormReturn;
+		request.send();
+	}
+
+	//计算总行数返回
+	function updatePageFormReturn() {
+		if (request.readyState == 4 && request.status == 200) {
+			var rowCount = parseInt(request.responseText, 0); // TODO √ 问题原因：BookCountServlet中，response写入int类型后，count变成了数字对应的符号
+			var pageCount = Math.ceil(rowCount / 2);
+			if (pageCount == 0)
+				pageCount = 1;
+			$("#lblTotal").text(pageCount);
+			var requestPage = $("#lblRequet").text();
+			if (requestPage > pageCount)
+				$("#lblRequet").text(pageCount);
+		}
+	}
+
+	function preRow() {
+		var requestPage = new Number($("#lblRequet").text());
+		if (requestPage <= 1)
+			return;
+		requestPage = requestPage - 1;
+		$("#lblRequet").text(requestPage);
+		findAllBookInfos();
+	}
+
+	function nextRow() {
+		var requestPage = new Number($("#lblRequet").text());
+		var totalPage = new Number($("#lblTotal").text());
+		if (requestPage >= totalPage)
+			return;
+		requestPage = requestPage + 1;
+		$("#lblRequet").text(requestPage);
+		findAllBookInfos();
+	}
+
+	function clearBooksTable() {
+		var table = document.getElementById("booksTable");
+		while (table.rows.length > 1)
+			table.deleteRow(1);
+	}
+
+	function choose(bookId) {
+		//1.选择的书显示在购物车里
+		//2.总价改变
+	}
+
+	/* 	var layerIndex = -1;
+	 function updateBook(bookId) {
+	 layerIndex = layer.open({
+	 type : 2,
+	 title : '修改图书',
+	 shadeClose : true, //点击遮罩关闭层
+	 area : [ '400px', '300px' ],
+	 content : 'bookEdit.html?bookId=' + bookId,
+	 end : function(e) {
+	 $("#btnQuery").click();
+	 }
+	 });
+	 }
+
+	 function closeBookEdit() {
+	 layer.close(layerIndex);
+	 }
+
+	 function deleteBook(bookId) {
+	 layer.confirm("你是否要删除图书", {
+	 btn : [ "确定", "取消" ]
+	 //按钮设置
+	 }, function() {
+	 var url = "servlet/BookDeleteServlet?bookId=" + bookId;
+	 request.open("get", url, true);
+	 request.onreadystatechange = deleteBookReturn;
+	 request.send();
+	 }, function() {
+	 });
+	 }
+
+	 function deleteBookReturn() {
+	 if (request.readyState == 4 && request.status == 200) {
+	 if (request.responseText.indexOf("correct") >= 0) {
+	 findAllBookInfos();
+	 layer.msg("删除成功!");
+	 } else
+	 layer.msg("删除失败!");
+	 }
+	 } */
+</script>
+</head>
+<body onload="findAllBookInfos();">
+	<form class="form-inline">
+		<div class="form-group">
+			<label class="control-label">文件</label> <input type="text"
+				class="form-control" id="bookName" />
+		</div>
+		<input type="button" id="btnQuery" class="form-control"
+			onclick="findAllBookInfos();" value="查询" />
+	</form>
+	<table id="booksTable" class="table table-bordered table-hover">
+		<caption>图书列表</caption>
+		<tr>
+			<td>编号</td>
+			<td>图书</td>
+			<td>价格(元/份)</td>
+			<td>出版日期</td>
+			<td>操作</td>
+		</tr>
+	</table>
+	<form class="form-inline">
+		<a onclick="preRow();">上一页</a> <a onclick="nextRow();">下一页</a> 总共<label
+			id="lblTotal"></label>页 当前<label id="lblRequet"></label>页
+	</form>
+</body>
+</html>
