@@ -25,7 +25,6 @@ public class OrderInfoDao {
 			}
 			return orderInfos.toArray(new OrderInfo[orderInfos.size()]);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return new OrderInfo[0];
 		}
@@ -51,8 +50,8 @@ public class OrderInfoDao {
 		}
 	}
 
-	//插入OrderInfo
-	public int insertOrderInfo(double orderDiscount) {
+	// 插入OrderInfo
+	public void insertOrderInfo(double orderDiscount) {
 		Connection conn = DbUtils.getConnection();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -62,12 +61,28 @@ public class OrderInfoDao {
 			ps = conn.prepareStatement(sql);
 			ps.setDouble(1, orderDiscount);
 			int ret = ps.executeUpdate();// 执行PreparedStatement
-			return ret;
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return -1;
 		} finally {
 			DbUtils.close(rs, ps, conn);
+		}
+	}
+
+	public int countRows() {
+		Connection conn = DbUtils.getConnection();
+		Statement st = null;
+		ResultSet rs = null;
+		try {
+			st = conn.createStatement();
+			String sql = "select count(*) as countRows from OrderInfo ";
+			rs = st.executeQuery(sql);
+			if (rs.next())
+				return rs.getInt("countRows");
+			else
+				return 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
 		}
 	}
 
@@ -78,7 +93,7 @@ public class OrderInfoDao {
 		 * System.out.println(info.getOrderTime()+"  "+info.getOrderDiscount());
 		 * }
 		 */
+		System.out.println(dao.countRows());
 
-		System.out.println(dao.insertOrderInfo(0.8));
 	}
 }

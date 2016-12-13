@@ -24,7 +24,6 @@ public class BookInfoDao {
 			}
 			return books.toArray(new BookInfo[books.size()]);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return new BookInfo[0];
 		}
@@ -41,7 +40,6 @@ public class BookInfoDao {
 			BookInfo[] array = this.roMapping(rs);
 			return array;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return new BookInfo[0];
 		} finally {
@@ -65,7 +63,6 @@ public class BookInfoDao {
 				return array;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		} finally {
@@ -124,7 +121,6 @@ public class BookInfoDao {
 			BookInfo[] array = this.roMapping(rs);
 			return array;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return new BookInfo[0];
 		} finally {
@@ -148,7 +144,6 @@ public class BookInfoDao {
 			else
 				return 0;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return 0;
 		}finally{

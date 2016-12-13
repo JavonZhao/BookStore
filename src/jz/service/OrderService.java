@@ -10,6 +10,7 @@ public class OrderService {
 
 	private OrderInfoDao orderInfoDao = new OrderInfoDao();
 	private OrderDetailDao orderDetailDao = new OrderDetailDao();
+	int orderId=-1;
 
 	/**
 	 * 
@@ -18,7 +19,8 @@ public class OrderService {
 	 */
 	public void SubmitOrder(List<ShoppingCarInfo> list) {
 		// 增加一条OrderInfo信息
-		int orderId = orderInfoDao.insertOrderInfo(0);// 0为没有折扣（默认没有折扣）
+		orderInfoDao.insertOrderInfo(0);
+		orderId=orderInfoDao.countRows();
 		for (ShoppingCarInfo shoppingCarInfo : list) {
 			orderDetailDao.insertOrderDetail(orderId,
 					shoppingCarInfo.getBookId(),

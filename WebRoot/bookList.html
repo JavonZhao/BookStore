@@ -161,7 +161,7 @@
 		var url = "servlet/OrderSubmitedServlet"; //TODO 需要表格信息
 		var jsonString = TableToJson("shoppingTable");
 		request.open("post", url, true);
-		request.onreadystatechange = changePrice;
+		//request.onreadystatechange = changePrice;
 		request.send(jsonString);
 	}
 
@@ -170,7 +170,7 @@
 	}
 
 	function TableToJson(tableid) { //tableid是你要转化的表的表名，是一个字符串，如"example" 
-		var keysArr = new Array("编号", "名称", "价格(元/份)", "数量", "总价"); // TODO 属性名不对应
+		var keysArr = new Array("编号", "名称", "价格(元/份)", "数量", "总价"); 
 		var AtrArr=new Array("bookId", "bookName", "bookPrice", "orderQuantity", "totalPrice")
 		var rows = document.getElementById(tableid).rows.length; //获得行数(包括thead) 
 		var colums = document.getElementById(tableid).rows[0].cells.length - 1; //获得列数 

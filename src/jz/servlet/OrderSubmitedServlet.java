@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jz.model.ShoppingCarInfo;
+import jz.service.OrderService;
 import jz.util.JsonUtils;
 
 @WebServlet("/servlet/OrderSubmitedServlet")
@@ -32,27 +33,18 @@ public class OrderSubmitedServlet extends HttpServlet {
 
 		// 获取jsonString
 		String jsonString = jsonBuffer.toString();
-		System.out.println(jsonString);
+		//System.out.println(jsonString);
 
 		// 提取List<ShoppingCarInfo> 进行OrderService
 		// 需要类型转换
-		// TODO 工作标记点
 		List<Object> list = JsonUtils.jsonToList(jsonString,
 				ShoppingCarInfo.class);
 		List<ShoppingCarInfo> shoppingCarInfos = new ArrayList<ShoppingCarInfo>();
 		for (Object obj : list) {
 			shoppingCarInfos.add((ShoppingCarInfo) obj);
 		}
+		OrderService orderService=new OrderService();
+		orderService.SubmitOrder(shoppingCarInfos);	
 	}
 	
-	/*public static void main(String[] args) {
-		String json = "[{'bookId':1,'bookName':'Java语言程序','bookPrice':27,'orderQuantity':2,'totalPrice':54},{'bookId':2,'bookName':'Java语言程序01','bookPrice':27,'orderQuantity':2,'totalPrice':54}]";
-		List<Object> list = JsonUtils.jsonToList(json,
-				ShoppingCarInfo.class);
-		List<ShoppingCarInfo> shoppingCarInfos = new ArrayList<ShoppingCarInfo>();
-		for (Object obj : list) {
-			shoppingCarInfos.add((ShoppingCarInfo) obj);
-		}
-		System.out.println(shoppingCarInfos.get(0).getBookName());
-	}*/
 }
