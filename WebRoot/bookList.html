@@ -56,7 +56,7 @@
 				col3.innerHTML = books[index].bookPrice;
 				col4.innerHTML = books[index].publishDate;
 				col5.innerHTML = "<a href='#' onclick='choose(\""
-						+ books[index].bookId + "\");' >修改</a>"; // TODO 有待修改    
+						+ books[index].bookId + "\");' >选择</a>";
 			}
 			//更新分页Form
 			updatePageForm();
@@ -116,6 +116,98 @@
 	function choose(bookId) {
 		//1.选择的书显示在购物车里
 		//2.总价改变
+		var url = "servlet/BookChosenServlet";
+		url = url + "?bookId=" + bookId;
+
+		request.open("get", url, true);
+		request.onreadystatechange = addChosenBook;
+		request.send();
+	}
+
+	function addChosenBook() {
+		if (request.readyState == 4 && request.status == 200) {
+			var table = document.getElementById("shoppingTable");
+			var books = JSON.parse(request.responseText);
+			for ( var index in books) {
+				var newRow = table.insertRow(table.rows.length);
+				var col1 = newRow.insertCell(0);
+				var col2 = newRow.insertCell(1);
+				var col3 = newRow.insertCell(2);
+				var col4 = newRow.insertCell(3);
+				var col5 = newRow.insertCell(4);
+				var col6 = newRow.insertCell(5);
+				col1.innerHTML = books[index].bookId;
+				col2.innerHTML = books[index].bookName;
+				col3.innerHTML = books[index].bookPrice;
+				col4.innerHTML = 2;//数量   // TODO 数量未完成
+				col5.innerHTML = parseInt(books[index].bookPrice) * 2;
+				col6.innerHTML = "<a href='#' onclick='deleteChosenBook();' >删除</a>";
+			}
+		}
+	}
+
+	function deleteChosenBook() {
+		var e = e || window.event;
+		var target = e.target || e.srcElement;
+		var rowIndex = -1;
+		if (target.parentNode.tagName.toLowerCase() == "td") {
+			rowIndex = target.parentNode.parentNode.rowIndex;
+		}
+		var table = document.getElementById("shoppingTable");
+		table.deleteRow(rowIndex);
+	}
+
+	function submitOrder() {
+		var url = "servlet/OrderSubmitedServlet"; //TODO 需要表格信息
+		var jsonString = TableToJson("shoppingTable");
+		request.open("post", url, true);
+		request.onreadystatechange = changePrice;
+		request.send(jsonString);
+	}
+
+	function changePrice() {
+		alert(TableToJson("shoppingTable"));
+	}
+
+	function TableToJson(tableid) { //tableid是你要转化的表的表名，是一个字符串，如"example" 
+		var keysArr = new Array("编号", "名称", "价格(元/份)", "数量", "总价"); // TODO 属性名不对应
+		var AtrArr=new Array("bookId", "bookName", "bookPrice", "orderQuantity", "totalPrice")
+		var rows = document.getElementById(tableid).rows.length; //获得行数(包括thead) 
+		var colums = document.getElementById(tableid).rows[0].cells.length - 1; //获得列数 
+		var json = "[";
+		var tdValue;
+		for (var i = 1; i < rows; i++) { //每行 
+			json += "{";
+			for (var j = 0; j < colums; j++) {
+				if (j == 1) {
+					tdName = keysArr[j]; //Json数据的键 
+					json += "\""; //加上一个双引号 
+					json += AtrArr[j];
+					json += "\"";
+					json += ":";
+					tdValue = document.getElementById(tableid).rows[i].cells[j].innerHTML;//Json数据的值 
+					json += "\"";
+					json += tdValue;
+					json += "\"";
+					json += ",";
+				} else {
+					tdName = keysArr[j]; //Json数据的键 
+					json += "\""; //加上一个双引号 
+					json += AtrArr[j];
+					json += "\"";
+					json += ":";
+					tdValue = document.getElementById(tableid).rows[i].cells[j].innerHTML;//Json数据的值 
+					json += tdValue;
+					json += ",";
+				}
+			}
+			json = json.substring(0, json.length - 1);
+			json += "}";
+			json += ",";
+		}
+		json = json.substring(0, json.length - 1);
+		json += "]";
+		return json;
 	}
 
 	/* 	var layerIndex = -1;
@@ -183,5 +275,30 @@
 		<a onclick="preRow();">上一页</a> <a onclick="nextRow();">下一页</a> 总共<label
 			id="lblTotal"></label>页 当前<label id="lblRequet"></label>页
 	</form>
+
+	<table id="shoppingTable" class="table table-bordered table-hover">
+		<caption>
+			已选列表 <span class="lead">满50减3 满100减8</span>
+		</caption>
+		<thead>
+			<tr>
+				<td>编号</td>
+				<td>名称</td>
+				<td>价格(元/份)</td>
+				<td>数量</td>
+				<td>总价</td>
+				<td>删除</td>
+			</tr>
+		</thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<form class="text-right">
+		总金额：<label id="amount">00.00</label>元</br> 折扣：<label id="discount">00.00</label>元</br>
+		实付金额： <label id="payAmount">00.00</label>元</br> <input type="button"
+			id="submit" onclick="submitOrder();" value="提交" />
+	</form>
+
 </body>
 </html>
