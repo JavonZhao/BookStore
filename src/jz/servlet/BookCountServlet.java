@@ -22,6 +22,7 @@ public class BookCountServlet extends HttpServlet{
 		BookInfoDao dao=new BookInfoDao();
 		int count=dao.countRowsByBookName(bookName);
 		resp.setCharacterEncoding("utf-8");
+		System.out.println("countRowsByBookName="+count);
 		String countString=String.valueOf(count);
 		resp.getWriter().write(countString);
 	}
