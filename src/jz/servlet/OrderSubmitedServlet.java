@@ -21,6 +21,7 @@ public class OrderSubmitedServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		req.setCharacterEncoding("utf-8");
 		StringBuffer jsonBuffer = new StringBuffer();
 		String line = null;
 		try {

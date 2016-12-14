@@ -46,9 +46,9 @@ public class JsonUtils {
 		gson = new Gson();
 		JsonParser jsonParser = new JsonParser();
 		JsonElement jsonElement = jsonParser.parse(str); // 将json字符串转换成JsonElement
-		//System.out.println(jsonElement);// ###
+		// System.out.println(jsonElement);// ###
 		JsonArray jsonArray = jsonElement.getAsJsonArray(); // 将JsonElement转换成JsonArray
-		//System.out.println(jsonArray.get(0));// ###
+		// System.out.println(jsonArray.get(0));// ###
 
 		List<Object> list = new ArrayList<Object>();
 
@@ -61,9 +61,24 @@ public class JsonUtils {
 	}
 
 	public static void main(String[] args) {
-		String str = "[{'bookId':1,'bookName':'Java语言程序','bookPrice':27,'orderQuantity':2,'totalPrice':54},{'bookId':2,'bookName':'Java语言程序01','bookPrice':27,'orderQuantity':2,'totalPrice':54}]";
-		List<Object> infos = jsonToList(str, ShoppingCarInfo.class);
-		ShoppingCarInfo info = (ShoppingCarInfo) infos.get(1);
-		System.out.println(info.getBookName());
+		/*
+		 * String str =
+		 * "[{'bookId':1,'bookName':'Java语言程序','bookPrice':27,'orderQuantity':2,'totalPrice':54},{'bookId':2,'bookName':'Java语言程序01','bookPrice':27,'orderQuantity':2,'totalPrice':54}]"
+		 * ; List<Object> infos = jsonToList(str, ShoppingCarInfo.class);
+		 * ShoppingCarInfo info = (ShoppingCarInfo) infos.get(1);
+		 * System.out.println(info.getBookName());
+		 */
+		/*int TotalPrice = -1;
+		String jsonString = "['54','54']";
+		List<Object> priceList = new ArrayList<Object>();
+		priceList = JsonUtils.jsonToList(jsonString, String.class);
+		for (Object price : priceList) {
+			TotalPrice += Integer.parseInt((String) price);
+		}
+		System.out.println(TotalPrice);*/
+		
+		int[] priceArr={3,5,6};
+		String json_back=JsonUtils.objectToJson(priceArr);
+		System.out.println(json_back);
 	}
 }

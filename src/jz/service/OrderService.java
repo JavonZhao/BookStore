@@ -28,10 +28,4 @@ public class OrderService {
 		}
 	}
 
-	/*
-	 * public static void main(String[] args) { List<ShoppingCarInfo> list = new
-	 * ArrayList<ShoppingCarInfo>(); list.add(new ShoppingCarInfo(1, "Java语言程序",
-	 * 27, 1, 27)); OrderService orderService=new OrderService();
-	 * orderService.SubmitOrder(list); }
-	 */
 }

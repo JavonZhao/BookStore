@@ -143,6 +143,7 @@
 				col5.innerHTML = parseInt(books[index].bookPrice) * 2;
 				col6.innerHTML = "<a href='#' onclick='deleteChosenBook();' >删除</a>";
 			}
+			calculateTotalPrice();
 		}
 	}
 
@@ -155,23 +156,21 @@
 		}
 		var table = document.getElementById("shoppingTable");
 		table.deleteRow(rowIndex);
+		calculateTotalPrice();
 	}
 
 	function submitOrder() {
 		var url = "servlet/OrderSubmitedServlet"; //TODO 需要表格信息
 		var jsonString = TableToJson("shoppingTable");
 		request.open("post", url, true);
-		//request.onreadystatechange = changePrice;
+		//request.onreadystatechange = ;
 		request.send(jsonString);
 	}
 
-	function changePrice() {
-		alert(TableToJson("shoppingTable"));
-	}
-
 	function TableToJson(tableid) { //tableid是你要转化的表的表名，是一个字符串，如"example" 
-		var keysArr = new Array("编号", "名称", "价格(元/份)", "数量", "总价"); 
-		var AtrArr=new Array("bookId", "bookName", "bookPrice", "orderQuantity", "totalPrice")
+		var keysArr = new Array("编号", "名称", "价格(元/份)", "数量", "总价");
+		var AtrArr = new Array("bookId", "bookName", "bookPrice",
+				"orderQuantity", "totalPrice");
 		var rows = document.getElementById(tableid).rows.length; //获得行数(包括thead) 
 		var colums = document.getElementById(tableid).rows[0].cells.length - 1; //获得列数 
 		var json = "[";
@@ -208,6 +207,45 @@
 		json = json.substring(0, json.length - 1);
 		json += "]";
 		return json;
+	}
+
+	function columnToJson(columnId) {//columnId表示的是一列的名称，例如“总价”
+		var rows = document.getElementById("shoppingTable").rows.length; //获得行数(包括thead) 
+		var json = "[";
+		var tdValue;
+		for (var i = 0; i < rows - 1; i++) {//每行
+			tdValue = document.getElementById("shoppingTable").rows[i + 1].cells[columnId].innerHTML;//Json数据的值
+			json += "\"";
+			json += tdValue;
+			json += "\"";
+			json += ",";
+		}
+		json = json.substring(0, json.length - 1);
+		json += "]";
+		return json;
+	}
+
+	function calculateTotalPrice() {
+		var url = "servlet/CalculateTotalPriceServlet";
+		var jsonString = columnToJson(4);//总价格的json数据
+		alert(jsonString);
+		request.open("post", url, true); //这里一定要用post！！！(传字符流用post，传url参数用get)
+		request.onreadystatechange = changePrice;
+		//request.send("["+"\""+"54"+"\""+"]");
+		request.send(jsonString);
+	}
+
+	function changePrice() {
+		if (request.readyState == 4 && request.status == 200) {
+			var prices = JSON.parse(request.responseText);
+			totalPrice = prices[0];
+			discount = prices[1];
+			finalPrice = prices[2];
+			//alert("youma");
+			$("#totalPrice").text(totalPrice);
+			$("#discount").text(discount);
+			$("#finalPrice").text(finalPrice);
+		}
 	}
 
 	/* 	var layerIndex = -1;
@@ -295,10 +333,11 @@
 	</table>
 
 	<form class="text-right">
-		总金额：<label id="amount">00.00</label>元</br> 折扣：<label id="discount">00.00</label>元</br>
-		实付金额： <label id="payAmount">00.00</label>元</br> <input type="button"
+		总金额：<label id="totalPrice">00.00</label>元</br> 折扣：<label id="discount">00.00</label>元</br>
+		实付金额： <label id="finalPrice">00.00</label>元</br> <input type="button"
 			id="submit" onclick="submitOrder();" value="提交" />
 	</form>
+	
 
 </body>
 </html>
